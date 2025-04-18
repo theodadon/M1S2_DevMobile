@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">CNIeReader</string>
+    <string name="scan_prompt">Approchez votre CNIe NFC</string>
+    <string name="read_success">Lecture réussie !</string>
+    <string name="read_failure">Erreur de lecture : %1$s</string>
+</resources>

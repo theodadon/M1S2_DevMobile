@@ -1,0 +1,5 @@
+package com.example.cnireader.util
+import android.app.Activity
+
+/* Helper : exécute sur le thread UI depuis une coroutine IO */
+fun Activity.onUi(block: () -> Unit) = runOnUiThread(block)

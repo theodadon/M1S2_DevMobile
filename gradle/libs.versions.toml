@@ -16,6 +16,8 @@ scubaSmartcards = "0.0.23"
 statScm = "1.2.0"
 relish = "0.5.1"
 scubaScAndroid = "0.0.26"
+monitor = "1.7.2"
+junitKtx = "1.2.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -34,6 +36,8 @@ scuba-smartcards = { module = "net.sf.scuba:scuba-smartcards", version.ref = "sc
 stat-scm = { group = "net.sf", name = "stat-scm", version.ref = "statScm" }
 relish = { group = "net.sf", name = "relish", version.ref = "relish" }
 scuba-sc-android = { group = "net.sf.scuba", name = "scuba-sc-android", version.ref = "scubaScAndroid" }
+androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

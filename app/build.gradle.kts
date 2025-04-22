@@ -48,5 +48,7 @@ dependencies {
     // implementation("com.madgag.spongycastle:prov:1.58.0.0")
 
     implementation(libs.relish)
+    implementation(libs.androidx.monitor)
+    implementation(libs.androidx.junit.ktx)
 }
 

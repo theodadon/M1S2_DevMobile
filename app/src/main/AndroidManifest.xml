@@ -16,6 +16,13 @@
             android:exported="true"
             android:launchMode="singleTop">
 
+            <!-- Filtre pour lancer l'app depuis le launcher -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
+            <!-- Filtre pour recevoir les tags NFC -->
             <intent-filter>
                 <action android:name="android.nfc.action.TECH_DISCOVERED"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -25,5 +32,6 @@
                 android:name="android.nfc.action.TECH_DISCOVERED"
                 android:resource="@xml/nfc_tech_filter"/>
         </activity>
+
     </application>
 </manifest>

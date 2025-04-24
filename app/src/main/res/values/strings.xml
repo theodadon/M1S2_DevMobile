@@ -3,4 +3,5 @@
     <string name="scan_prompt">Approchez votre CNIe NFC</string>
     <string name="read_success">Lecture réussie !</string>
     <string name="read_failure">Erreur de lecture : %1$s</string>
+    <string name="emoji_api_key">3a4b5f02738c0eb565c378c6d5f0fc9c2d8a4620</string>
 </resources>

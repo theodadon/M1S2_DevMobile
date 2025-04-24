@@ -1,7 +1,10 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.google.dagger.hilt.android")
+    id("org.jetbrains.kotlin.kapt")
 }
+
 
 android {
     namespace = "com.example.cnireader"
@@ -26,11 +29,31 @@ android {
             )
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_11; targetCompatibility = JavaVersion.VERSION_11 }
     kotlinOptions   { jvmTarget = "11" }
 }
 
 dependencies {
+    testImplementation(libs.mockwebserver)
+// JUnit
+    testImplementation(libs.junit)
+// (Optionnel) Coroutines-test si tu veux tester en runBlockingTest
+    testImplementation(libs.kotlinx.coroutines.test)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.okhttp.logging)
+    implementation(libs.okhttp)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.moshi)
+    implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
+
+// ViewModel Scope
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation("com.google.dagger:hilt-android:2.56.2")
+    kapt("com.google.dagger:hilt-compiler:2.56.2")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

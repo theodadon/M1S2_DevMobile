@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:padding="16dp">
 
     <LinearLayout
@@ -8,37 +9,91 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- Titre -->
         <TextView
             android:text="Lecture + authentification d’une CNIe"
-            android:textAppearance="?attr/textAppearanceHeadline6"
+            style="@style/TextAppearance.Material3.HeadlineSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingBottom="12dp"/>
 
+        <!-- CAN -->
         <EditText
-            android:id="@+id/et_can"
+            android:id="@+id/etCan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="CAN (6 chiffres)"
-            android:maxLength="6"
-            android:inputType="number"/>
+            android:hint="CAN (6 chiffres)"
+            android:inputType="number"
+            android:maxLength="6"/>
 
+        <!-- Bouton NFC -->
         <Button
-            android:id="@+id/btn_scan"
+            android:id="@+id/btnScan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Scanner la carte"/>
 
+        <!-- Boutons de test -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <Button
+                android:id="@+id/btnTestValid"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Test Valide"/>
+
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="wrap_content"/>
+
+            <Button
+                android:id="@+id/btnTestInvalid"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Test Pas Valide"/>
+        </LinearLayout>
+
+        <!-- Nouveau bouton Test API -->
+        <Button
+            android:id="@+id/btnTestApi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Test API Emoji"/>
+
+        <!-- Séparateur -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="16dp"
             android:background="@color/black"/>
 
+        <!-- Log & Résultat -->
         <TextView
-            android:id="@+id/tv_log"
+            android:id="@+id/tvLog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:id="@+id/ivPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="12dp"
+            android:alpha="0"
+            android:scaleType="centerCrop"/>
+
+        <TextView
+            android:id="@+id/tvEmoji"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:layout_marginTop="8dp"/>
+
     </LinearLayout>
 </ScrollView>
-

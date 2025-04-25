@@ -1,6 +1,7 @@
 [versions]
 activityKtx = "1.10.1"
 agp = "8.9.2"
+#bcprov = "1.77"           # ← Ajouté
 core = "1.58.0.0"
 imageioJpeg2000 = "3.8.1"
 jmrtd = "0.8.1"
@@ -41,9 +42,7 @@ hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.r
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 core = { module = "com.madgag.spongycastle:core", version.ref = "core" }
 imageio-jpeg2000 = { module = "com.twelvemonkeys.imageio:imageio-jpeg2000", version.ref = "imageioJpeg2000" }
-#noinspection SimilarGradleDependency
 jmrtd = { module = "org.jmrtd:jmrtd", version.ref = "jmrtd" }
-#noinspection SimilarGradleDependency
 jmrtd-v0810 = { module = "org.jmrtd:jmrtd", version.ref = "jmrtdVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -58,9 +57,9 @@ relish = { group = "net.sf", name = "relish", version.ref = "relish" }
 scuba-sc-android = { group = "net.sf.scuba", name = "scuba-sc-android", version.ref = "scubaScAndroid" }
 androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
 androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
+#bcprov = { group = "org.bouncycastle", name = "bcprov-jdk15to18", version.ref = "bcprov" }
 
 [plugins]
 hilt = { id = "com.google.dagger.hilt.android", version = "2.56.2" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-

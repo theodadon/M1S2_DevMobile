@@ -1,5 +1,3 @@
-/** ui/ScannerState */
-
 package com.example.cnireader.ui
 
 import android.graphics.Bitmap

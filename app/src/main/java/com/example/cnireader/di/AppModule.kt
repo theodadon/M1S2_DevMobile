@@ -1,5 +1,3 @@
-/** di/AppModule */
-
 package com.example.cnireader.di
 
 import com.example.cnireader.data.PassportRepository
@@ -13,10 +11,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class AppModule {
-
     @Binds
     @Singleton
-    abstract fun bindPassportRepository(
-        impl: PassportRepositoryImpl
-    ): PassportRepository
+    abstract fun bindPassportRepository(impl: PassportRepositoryImpl): PassportRepository
 }

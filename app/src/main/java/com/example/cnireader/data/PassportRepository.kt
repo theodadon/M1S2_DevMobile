@@ -1,4 +1,3 @@
-/** data/PassportRepository */
 package com.example.cnireader.data
 
 import android.nfc.Tag
@@ -14,4 +13,3 @@ data class ScanResult(
 interface PassportRepository {
     suspend fun scan(tag: Tag, can: String): ScanResult
 }
-

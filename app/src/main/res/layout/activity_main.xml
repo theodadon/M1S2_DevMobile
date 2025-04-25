@@ -26,31 +26,26 @@
             android:inputType="number"
             android:maxLength="6"/>
 
-        <!-- Bouton NFC -->
+        <!-- Boutons -->
         <Button
             android:id="@+id/btnScan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Scanner la carte"/>
-
-        <!-- Boutons de test -->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp">
-
             <Button
                 android:id="@+id/btnTestValid"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="Test Valide"/>
-
             <Space
                 android:layout_width="8dp"
                 android:layout_height="wrap_content"/>
-
             <Button
                 android:id="@+id/btnTestInvalid"
                 android:layout_width="0dp"
@@ -58,8 +53,6 @@
                 android:layout_height="wrap_content"
                 android:text="Test Pas Valide"/>
         </LinearLayout>
-
-        <!-- Nouveau bouton Test API -->
         <Button
             android:id="@+id/btnTestApi"
             android:layout_width="match_parent"
@@ -74,12 +67,13 @@
             android:layout_marginVertical="16dp"
             android:background="@color/black"/>
 
-        <!-- Log & Résultat -->
+        <!-- Log user-friendly -->
         <TextView
             android:id="@+id/tvLog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
+        <!-- Photo -->
         <ImageView
             android:id="@+id/ivPhoto"
             android:layout_width="match_parent"
@@ -88,6 +82,7 @@
             android:alpha="0"
             android:scaleType="centerCrop"/>
 
+        <!-- Emoji -->
         <TextView
             android:id="@+id/tvEmoji"
             android:layout_width="match_parent"
@@ -95,5 +90,15 @@
             android:textSize="18sp"
             android:layout_marginTop="8dp"/>
 
+        <!-- RAW dump / stacktrace -->
+        <TextView
+            android:id="@+id/tvRawData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:padding="8dp"
+            android:background="#EEEEEE"
+            android:textIsSelectable="true"
+            android:scrollbars="vertical"/>
     </LinearLayout>
 </ScrollView>

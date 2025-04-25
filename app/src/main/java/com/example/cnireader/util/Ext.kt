@@ -1,5 +1,3 @@
-/** util/Ext */
-
 package com.example.cnireader.util
 
 import android.app.Activity

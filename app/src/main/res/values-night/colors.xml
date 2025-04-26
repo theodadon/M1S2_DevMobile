@@ -1,0 +1,10 @@
+<resources>
+    <!-- Couleurs Dark Mode -->
+    <color name="background_color">#3C3D37</color>
+    <color name="primary_button">#90CAF9</color> <!-- Bleu clair adapté -->
+    <color name="valid_button">#81C784</color>   <!-- Vert clair adapté -->
+    <color name="invalid_button">#E57373</color> <!-- Rouge clair adapté -->
+    <color name="api_button">#FFB74D</color>     <!-- Orange clair adapté -->
+    <color name="separator_color">#757575</color>
+    <color name="text_primary">#FFFFFF</color>   <!-- Texte blanc -->
+</resources>

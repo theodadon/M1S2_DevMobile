@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FAFAFA"
+    android:background="@color/background_color"
     android:padding="20dp">
 
     <LinearLayout
@@ -14,11 +14,12 @@
         <!-- Titre -->
         <TextView
             android:text="Lecture + authentification d’une CNIe"
-            style="@style/TextAppearance.Material3.HeadlineMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingBottom="16dp"
-            android:textAlignment="center"/>
+            android:textAlignment="center"
+            android:textColor="@color/text_primary"
+            android:textSize="24sp"/>
 
         <!-- CAN -->
         <EditText
@@ -38,8 +39,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="📷 Scanner la carte"
-            android:backgroundTint="#2196F3"
-            android:textColor="#FFFFFF"
+            android:backgroundTint="@color/primary_button"
+            android:textColor="@android:color/white"
             android:layout_marginBottom="12dp"/>
 
         <!-- Boutons Test -->
@@ -56,8 +57,8 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="✅ Test Valide"
-                android:backgroundTint="#4CAF50"
-                android:textColor="#FFFFFF"/>
+                android:backgroundTint="@color/valid_button"
+                android:textColor="@android:color/white"/>
 
             <Space
                 android:layout_width="12dp"
@@ -69,8 +70,8 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="❌ Test Pas Valide"
-                android:backgroundTint="#F44336"
-                android:textColor="#FFFFFF"/>
+                android:backgroundTint="@color/invalid_button"
+                android:textColor="@android:color/white"/>
         </LinearLayout>
 
         <Button
@@ -78,15 +79,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="🌐 Test API Emoji"
-            android:backgroundTint="#FF9800"
-            android:textColor="#FFFFFF"
+            android:backgroundTint="@color/api_button"
+            android:textColor="@android:color/white"
             android:layout_marginBottom="20dp"/>
 
         <!-- Séparateur -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#BDBDBD"
+            android:background="@color/separator_color"
             android:layout_marginBottom="20dp"/>
 
         <!-- Log -->
@@ -96,6 +97,7 @@
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:textStyle="bold"
+            android:textColor="@color/text_primary"
             android:layout_marginBottom="16dp"/>
 
         <!-- Photo -->
@@ -115,6 +117,7 @@
             android:layout_height="wrap_content"
             android:textSize="24sp"
             android:gravity="center"
+            android:textColor="@color/text_primary"
             android:layout_marginBottom="16dp"/>
 
         <!-- RAW Data -->
@@ -122,11 +125,12 @@
             android:id="@+id/tvRawData"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#EEEEEE"
+            android:background="@color/separator_color"
             android:padding="12dp"
             android:textIsSelectable="true"
             android:scrollbars="vertical"
             android:layout_marginBottom="20dp"
-            android:textSize="14sp"/>
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"/>
     </LinearLayout>
 </ScrollView>

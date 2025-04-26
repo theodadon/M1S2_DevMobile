@@ -2,20 +2,23 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:background="#FAFAFA"
+    android:padding="20dp">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal">
 
         <!-- Titre -->
         <TextView
             android:text="Lecture + authentification d’une CNIe"
-            style="@style/TextAppearance.Material3.HeadlineSmall"
+            style="@style/TextAppearance.Material3.HeadlineMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="12dp"/>
+            android:paddingBottom="16dp"
+            android:textAlignment="center"/>
 
         <!-- CAN -->
         <EditText
@@ -24,62 +27,85 @@
             android:layout_height="wrap_content"
             android:hint="CAN (6 chiffres)"
             android:inputType="number"
-            android:maxLength="6"/>
+            android:maxLength="6"
+            android:background="@drawable/bg_edittext"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"/>
 
-        <!-- Boutons -->
+        <!-- Bouton Scanner -->
         <Button
             android:id="@+id/btnScan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Scanner la carte"/>
+            android:text="📷 Scanner la carte"
+            android:backgroundTint="#2196F3"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Boutons Test -->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp">
+            android:layout_marginBottom="12dp"
+            android:gravity="center">
+
             <Button
                 android:id="@+id/btnTestValid"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Test Valide"/>
+                android:text="✅ Test Valide"
+                android:backgroundTint="#4CAF50"
+                android:textColor="#FFFFFF"/>
+
             <Space
-                android:layout_width="8dp"
+                android:layout_width="12dp"
                 android:layout_height="wrap_content"/>
+
             <Button
                 android:id="@+id/btnTestInvalid"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Test Pas Valide"/>
+                android:text="❌ Test Pas Valide"
+                android:backgroundTint="#F44336"
+                android:textColor="#FFFFFF"/>
         </LinearLayout>
+
         <Button
             android:id="@+id/btnTestApi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Test API Emoji"/>
+            android:text="🌐 Test API Emoji"
+            android:backgroundTint="#FF9800"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="20dp"/>
 
         <!-- Séparateur -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginVertical="16dp"
-            android:background="@color/black"/>
+            android:background="#BDBDBD"
+            android:layout_marginBottom="20dp"/>
 
-        <!-- Log user-friendly -->
+        <!-- Log -->
         <TextView
             android:id="@+id/tvLog"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
 
         <!-- Photo -->
         <ImageView
             android:id="@+id/ivPhoto"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp"
             android:alpha="0"
+            android:background="@drawable/bg_image"
             android:scaleType="centerCrop"/>
 
         <!-- Emoji -->
@@ -87,18 +113,20 @@
             android:id="@+id/tvEmoji"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:layout_marginTop="8dp"/>
+            android:textSize="24sp"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"/>
 
-        <!-- RAW dump / stacktrace -->
+        <!-- RAW Data -->
         <TextView
             android:id="@+id/tvRawData"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:padding="8dp"
             android:background="#EEEEEE"
+            android:padding="12dp"
             android:textIsSelectable="true"
-            android:scrollbars="vertical"/>
+            android:scrollbars="vertical"
+            android:layout_marginBottom="20dp"
+            android:textSize="14sp"/>
     </LinearLayout>
 </ScrollView>

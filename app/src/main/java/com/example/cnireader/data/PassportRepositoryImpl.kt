@@ -1,6 +1,7 @@
 // File: app/src/main/java/com/example/cnireader/data/PassportRepositoryImpl.kt
 package com.example.cnireader.data
 
+import com.example.cnireader.data.PassportRepository
 import android.content.Context
 import android.nfc.Tag
 import android.util.Log
@@ -21,21 +22,19 @@ class PassportRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val emojiApi: EmojiApiService,
     private val accessKey: String
-) : PassportRepository {
+) : PassportRepository() {
 
     override suspend fun scan(tag: Tag, can: String): ScanResult {
         try {
-            // 1) Charge le certificat CSCA
+            // 1) Charger le certificat CSCA
             val csca = context.assets.open("csca_france.crt").use { it.readBytes() }
 
             // 2) Lecture NFC + PACE + PassiveAuth
             val data: CniData = try {
                 PassportReader.read(tag, can, csca)
             } catch (e: PassportReadException) {
-                // Lecture NFC ratée
-                Log.e("PassportRepo", "lecture CNI échouée", e)
+                Log.e("PassportRepo", "Lecture CNI échouée", e)
                 throw ScanException(
-                    // On inclut le message + la stacktrace complète
                     "Erreur lecture CNI : ${e.message}\n\n${e.stackTraceToString()}",
                     e
                 )
@@ -54,12 +53,12 @@ class PassportRepositoryImpl @Inject constructor(
             }
             Log.d("PassportRepo", "✅ ${all.size} emojis reçus")
 
-            // 4) Choix aléatoire
+            // 4) Choix aléatoire d'un emoji
             val idx = ThreadLocalRandom.current().nextInt(all.size)
             val emoji = all[idx].character
             Log.d("PassportRepo", "🎲 Emoji tiré : $emoji")
 
-            // 5) Tout est OK, on renvoie le résultat
+            // 5) Retour du résultat
             return ScanResult(
                 lastName   = data.lastName,
                 firstNames = data.firstNames,
@@ -69,10 +68,10 @@ class PassportRepositoryImpl @Inject constructor(
             )
 
         } catch (e: ScanException) {
-            // Si c'était déjà un ScanException, on le remonte tel quel
+            // Erreur fonctionnelle déjà formatée
             throw e
         } catch (e: Exception) {
-            // Catch “inattendu” : on loggue et on expose la stacktrace
+            // Erreur technique inconnue
             Log.e("PassportRepo", "Erreur inattendue", e)
             throw ScanException(
                 "Erreur inconnue : ${e.message}\n\n${e.stackTraceToString()}",

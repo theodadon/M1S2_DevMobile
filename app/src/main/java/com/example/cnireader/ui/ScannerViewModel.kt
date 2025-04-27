@@ -22,13 +22,11 @@ class ScannerViewModel @Inject constructor(
     private val _state = MutableStateFlow<ScannerState>(ScannerState.Idle)
     val state: StateFlow<ScannerState> = _state
 
-    /** Démarre la lecture + journaux pas à pas. */
     fun scan(tag: Tag, can: String) {
         _state.value = ScannerState.Scanning
 
         viewModelScope.launch {
             val logger = PassportLogger { logs ->
-                // à chaque nouveau log, on passe en Error pour rafraîchir tvRawData
                 _state.value = ScannerState.Error(logs)
             }
 
@@ -41,12 +39,13 @@ class ScannerViewModel @Inject constructor(
                     ?: throw IllegalStateException("Décodage de la photo impossible")
 
                 _state.value = ScannerState.Success(
-                    lastName   = res.lastName,
+                    lastName = res.lastName,
                     firstNames = res.firstNames,
-                    birthDate  = res.birthDate,
-                    photo      = bmp,
-                    emoji      = res.emoji
+                    birthDate = res.birthDate,
+                    photo = bmp,
+                    emoji = res.emoji
                 )
+
             } catch (e: Exception) {
                 if (_state.value is ScannerState.Scanning) {
                     _state.value = ScannerState.Error(e.message ?: "Erreur inconnue")

@@ -9,7 +9,6 @@ import java.security.Security
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        // On s’assure que BC est enregistré avant jMRTD
         if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
             Security.insertProviderAt(BouncyCastleProvider(), 1)
         }

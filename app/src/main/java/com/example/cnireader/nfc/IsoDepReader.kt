@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.cnireader.nfc
 
 import android.nfc.Tag
@@ -15,41 +17,58 @@ object IsoDepReader {
             isoDep.connect()
             logger.log("✅ Connexion réussie")
 
-            // Allonge un peu les timeouts
             isoDep.timeout = 5000
 
-            // Première commande : SELECT MF (Master File)
-            val selectMf = byteArrayOf(0x00.toByte(), 0xA4.toByte(), 0x00.toByte(), 0x0C.toByte(), 0x02.toByte(), 0x3F.toByte(), 0x00.toByte())
-            logger.log("➡️ SELECT MF : ${selectMf.toHex()}")
-            val responseMf = isoDep.transceive(selectMf)
-            logger.log("⬅️ Réponse MF : ${responseMf.toHex()}")
+            // 1️⃣ SELECT Master File
+            val selectMF = byteArrayOf(0x00, 0xA4.toByte(), 0x00, 0x0C, 0x02, 0x3F, 0x00)
+            logger.log("➡️ SELECT MF : ${selectMF.toHex()}")
+            isoDep.transceive(selectMF).also { logger.log("⬅️ Réponse MF : ${it.toHex()}") }
 
-            // (optionnel) Tester SELECT AID IAS-ECC (application ID pour les cartes françaises)
-            // Ex : "A000000167455349415343454343" = AID IAS-ECC
-            val selectIasAid = byteArrayOf(
-                0x00.toByte(), 0xA4.toByte(), 0x04.toByte(), 0x00.toByte(),
-                0x0D.toByte(), // longueur 13
-                0xA0.toByte(), 0x00.toByte(), 0x00.toByte(), 0x01.toByte(),
-                0x67.toByte(), 0x45.toByte(), 0x53.toByte(), 0x49.toByte(),
-                0x41.toByte(), 0x53.toByte(), 0x43.toByte(), 0x45.toByte(),
-                0x43.toByte()
+            // 2️⃣ SELECT IAS-ECC AID
+            val selectIAS = byteArrayOf(
+                0x00, 0xA4.toByte(), 0x04, 0x00, 0x0D,
+                0xA0.toByte(), 0x00, 0x00, 0x01, 0x67, 0x45, 0x53, 0x49, 0x41, 0x53, 0x43, 0x45, 0x43
             )
-            logger.log("➡️ SELECT IAS-ECC AID : ${selectIasAid.toHex()}")
-            val responseAid = isoDep.transceive(selectIasAid)
-            logger.log("⬅️ Réponse AID : ${responseAid.toHex()}")
+            logger.log("➡️ SELECT IAS-ECC AID : ${selectIAS.toHex()}")
+            isoDep.transceive(selectIAS).also { logger.log("⬅️ Réponse AID : ${it.toHex()}") }
+
+            // 3️⃣ SELECT le fichier Identity (0500)
+            val selectIdentity = byteArrayOf(0x00, 0xA4.toByte(), 0x02, 0x0C, 0x02, 0x05, 0x00)
+            logger.log("➡️ SELECT fichier 0500 (identité)")
+            isoDep.transceive(selectIdentity).also { logger.log("⬅️ Réponse 0500 : ${it.toHex()}") }
+
+            // 4️⃣ READ BINARY (on lit les infos personnelles)
+            val readBinary = byteArrayOf(0x00, 0xB0.toByte(), 0x00, 0x00, 0x00)
+            logger.log("➡️ READ BINARY sur 0500")
+            val dataIdentity = isoDep.transceive(readBinary)
+            logger.log("⬅️ Données identité : ${dataIdentity.toHex()}")
+
+            // 5️⃣ Parse grossier des données (debug)
+            val text = String(dataIdentity.dropLast(2).toByteArray())
+            logger.log("📄 Infos brutes :\n$text")
+
+            // (bonus plus tard : découper proprement en Nom / Prénom / DDN)
+
+            // 6️⃣ Lire aussi la photo : SELECT 0600 + READ BINARY
+            val selectPhoto = byteArrayOf(0x00, 0xA4.toByte(), 0x02, 0x0C, 0x02, 0x06, 0x00)
+            logger.log("➡️ SELECT fichier 0600 (photo)")
+            isoDep.transceive(selectPhoto).also { logger.log("⬅️ Réponse 0600 : ${it.toHex()}") }
+
+            val readPhoto = byteArrayOf(0x00, 0xB0.toByte(), 0x00, 0x00, 0x00)
+            logger.log("➡️ READ BINARY sur 0600")
+            val dataPhoto = isoDep.transceive(readPhoto)
+            logger.log("⬅️ Photo reçue (${dataPhoto.size} octets)")
+
+            // Ensuite à toi de décoder JPEG2000 (option à ajouter)
 
         } catch (e: Exception) {
             logger.log("❌ Exception : ${e.message}")
             throw e
         } finally {
-            try {
-                isoDep.close()
-                logger.log("🔒 Déconnexion NFC")
-            } catch (_: Exception) { }
+            try { isoDep.close(); logger.log("🔒 Déconnexion NFC") } catch (_: Exception) {}
         }
     }
 
-    // Extension utilitaire pour afficher proprement en hexadécimal
     private fun ByteArray.toHex(): String =
         joinToString(" ") { "%02X".format(it) }
 }

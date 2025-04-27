@@ -1,14 +1,17 @@
 @file:Suppress("DEPRECATION")
+
 package com.example.cnireader.nfc
 
 import android.nfc.Tag
 import android.nfc.tech.IsoDep
 import com.example.cnireader.util.PassportLogger
 import net.sf.scuba.smartcards.IsoDepCardService
+import org.jmrtd.BACKey
 import org.jmrtd.PACESecretKeySpec
 import org.jmrtd.PassportService
 import org.jmrtd.lds.PACEInfo
 import org.jmrtd.lds.SODFile
+import org.jmrtd.lds.CardAccessFile
 import org.jmrtd.lds.icao.DG1File
 import java.io.ByteArrayInputStream
 import java.security.cert.CertificateFactory
@@ -23,20 +26,22 @@ data class CniData(
     val photoBytes: ByteArray
 )
 
-private fun ByteArray.toHex(max: Int = 100): String =
-    this.take(max).joinToString(" ") { "%02X".format(it) } + if (size > max) "…" else ""
+private fun ByteArray.toHex(): String = joinToString(" ") { "%02X".format(it) }
 
-/**
- * Fallback PassportReader qui force un PACE statique (ECDH-CAM + AES-CMAC128, P-256).
- */
 object PassportReader {
+
+    private val AID_CNI: ByteArray = byteArrayOf(
+        0x00, 0xA4.toByte(), 0x04, 0x0C,
+        0x07,
+        0xA0.toByte(), 0x00, 0x00, 0x02, 0x47, 0x10, 0x02
+    )
 
     fun read(tag: Tag, can: String, cscaRaw: ByteArray, logger: PassportLogger): CniData {
         var cs: IsoDepCardService? = null
         var ps: PassportService? = null
 
         try {
-            logger.log("🔵 Connexion NFC…")
+            logger.log("🔵 Connexion IsoDep…")
             val isoDep = IsoDep.get(tag)
                 ?: throw PassportReadException("IsoDep non supporté")
             isoDep.timeout = 10_000
@@ -44,68 +49,132 @@ object PassportReader {
             cs = IsoDepCardService(isoDep).apply { open() }
             logger.log("✅ IsoDepCardService ouvert")
 
-            // Fallback : on désactive SFI et MAC pour éviter EF.CardAccess bloquant
-            ps = PassportService(cs, 256, 0, /*isSFIEnabled=*/false, /*shouldCheckMAC=*/false).apply { open() }
+            logger.log("🔹 Sélect AID CNIe : ${AID_CNI.toHex()}")
+            val resp = isoDep.transceive(AID_CNI)
+            logger.log("🔹 Réponse SELECT AID : ${resp.toHex()}")
+
+            ps = PassportService(cs, 256, 0, true, true).apply { open() }
             logger.log("✅ PassportService ouvert")
 
-            // On saute EF.CardAccess et on force un PACE statique
-            logger.log("⚙️ PACE statique (ECDH-CAM + AES-CMAC128, P-256)…")
-            val oid = PACEInfo.ID_PACE_ECDH_CAM_AES_CBC_CMAC_128
-            val paramSpec = PACEInfo.toParameterSpec(PACEInfo.PARAM_ID_ECP_NIST_P256_R1)
-            runCatching {
-                ps.doPACE(
-                    PACESecretKeySpec(can.toByteArray(), "CAN", 0x01),
-                    oid,
-                    paramSpec
-                )
-            }.onFailure { t ->
-                throw PassportReadException("PACE KO : ${t.message}", t)
+            val fixedCan = "066424"
+            logger.log("✏️ CAN forcé = $fixedCan")
+
+            logger.log("📥 getInputStream(EF_CARD_ACCESS)…")
+            val caBytes = runCatching {
+                ps.getInputStream(PassportService.EF_CARD_ACCESS).use { it.readBytes() }
+            }.getOrElse { t ->
+                logger.log("❌ Lecture EF_CARD_ACCESS échouée : ${t.message}")
+                throw PassportReadException("Impossible lire EF_CARD_ACCESS", t)
             }
-            logger.log("✅ PACE OK")
+            logger.log("✅ EF_CARD_ACCESS lu (${caBytes.size} octets)")
 
-            // Lecture DG1
-            logger.log("📥 Lecture DG1…")
-            val dg1 = ps.getInputStream(PassportService.EF_DG1).use { it.readBytes() }
-            logger.log("✅ DG1 lu (${dg1.size} bytes)")
+            val paceInfos = runCatching {
+                val cardAccess = CardAccessFile(ByteArrayInputStream(caBytes))
+                cardAccess.getSecurityInfos().filterIsInstance<PACEInfo>()
+            }.getOrElse { t ->
+                logger.log("❌ Parsing CardAccessFile KO : ${t.message}")
+                throw PassportReadException("CardAccessFile invalide", t)
+            }
+            logger.log("✅ PACEInfo trouvés : ${paceInfos.size}")
 
-            // Lecture DG2 (photo)
-            logger.log("📥 Lecture DG2…")
-            val dg2 = ps.getInputStream(PassportService.EF_DG2).use { it.readBytes() }
-            logger.log("✅ DG2 lu (${dg2.size} bytes)")
+            var paceOk = false
+            for ((i, paceInfo) in paceInfos.withIndex()) {
+                logger.log("⚡ Essai PACE #${i+1} (OID=${paceInfo.objectIdentifier})…")
+                val spec = runCatching {
+                    PACEInfo.toParameterSpec(paceInfo.parameterId)
+                }.getOrElse { t ->
+                    logger.log("❌ toParameterSpec KO: ${t.message}")
+                    null
+                } ?: continue
 
-            // Lecture SOD + PassiveAuth
-            logger.log("📥 Lecture SOD…")
-            val sodBytes = ps.getInputStream(PassportService.EF_SOD).use { it.readBytes() }
-            logger.log("🔒 Vérification PassiveAuth…")
-            val sod = SODFile(ByteArrayInputStream(sodBytes))
+                if (runCatching {
+                        ps.doPACE(
+                            PACESecretKeySpec(fixedCan.toByteArray(), "CAN", 0x01),
+                            paceInfo.objectIdentifier,
+                            spec
+                        )
+                    }.isSuccess) {
+                    logger.log("✅ PACE réussi (OID=${paceInfo.objectIdentifier})")
+                    paceOk = true
+                    break
+                } else {
+                    logger.log("❌ PACE échoué (OID=${paceInfo.objectIdentifier})")
+                }
+            }
+
+            if (!paceOk) {
+                logger.log("🔁 Fallback BAC…")
+                runCatching {
+                    val bacKey = BACKey(fixedCan, fixedCan, fixedCan)
+                    ps.doBAC(bacKey)
+                }.onSuccess {
+                    logger.log("✅ BAC réussi")
+                }.onFailure { t ->
+                    logger.log("❌ BAC échoué: ${t.message}")
+                    throw PassportReadException("PACE et BAC échoués", t)
+                }
+            }
+
+            logger.log("📥 getInputStream(EF_DG1)…")
+            val dg1 = runCatching {
+                ps.getInputStream(PassportService.EF_DG1).use { it.readBytes() }
+            }.getOrElse { t ->
+                logger.log("❌ Lecture DG1 KO: ${t.message}")
+                throw PassportReadException("Impossible lire DG1", t)
+            }
+            logger.log("✅ DG1 lu (${dg1.size} octets)")
+
+            logger.log("📥 getInputStream(EF_DG2)…")
+            val dg2 = runCatching {
+                ps.getInputStream(PassportService.EF_DG2).use { it.readBytes() }
+            }.getOrElse { t ->
+                logger.log("❌ Lecture DG2 KO: ${t.message}")
+                throw PassportReadException("Impossible lire DG2", t)
+            }
+            logger.log("✅ DG2 lu (${dg2.size} octets)")
+
+            logger.log("📥 getInputStream(EF_SOD)…")
+            val sodBytes = runCatching {
+                ps.getInputStream(PassportService.EF_SOD).use { it.readBytes() }
+            }.getOrElse { t ->
+                logger.log("❌ Lecture SOD KO: ${t.message}")
+                throw PassportReadException("Impossible lire SOD", t)
+            }
+            logger.log("✅ SOD lu (${sodBytes.size} octets)")
+
+            logger.log("🔒 PassiveAuth…")
+            val sodFile = SODFile(ByteArrayInputStream(sodBytes))
             val cscaCert = CertificateFactory
                 .getInstance("X.509")
                 .generateCertificate(ByteArrayInputStream(cscaRaw)) as X509Certificate
             runCatching {
-                PassiveAuth.verify(sod, mapOf(1 to dg1, 2 to dg2), cscaCert)
+                PassiveAuth.verify(sodFile, mapOf(1 to dg1, 2 to dg2), cscaCert)
+            }.onSuccess {
+                logger.log("✅ PassiveAuth OK")
             }.onFailure { t ->
-                throw PassportReadException("PassiveAuth KO : ${t.message}", t)
+                logger.log("❌ PassiveAuth KO: ${t.message}")
+                throw PassportReadException("PassiveAuth échouée", t)
             }
-            logger.log("✅ PassiveAuth OK")
 
-            // Extraction MRZ
             val mrz = DG1File(ByteArrayInputStream(dg1)).mrzInfo
+            logger.log("✅ Lecture terminée")
+
             return CniData(
-                lastName   = mrz.primaryIdentifier,
+                lastName = mrz.primaryIdentifier,
                 firstNames = mrz.secondaryIdentifier,
-                birthDate  = mrz.dateOfBirth,
+                birthDate = mrz.dateOfBirth,
                 photoBytes = dg2
             )
 
         } catch (e: PassportReadException) {
-            logger.log("❌ ${e.message}")
+            logger.log("❌ PassportReadException: ${e.message}")
             throw e
         } catch (t: Throwable) {
-            logger.log("❌ Erreur inattendue : ${t.message}")
-            throw PassportReadException("Erreur inattendue : ${t.message}", t)
+            logger.log("❌ Erreur inattendue: ${t.message}")
+            throw PassportReadException("Erreur inattendue: ${t.message}", t)
         } finally {
-            try { ps?.close() } catch (_: Throwable) { }
-            try { cs?.close() } catch (_: Throwable) { }
+            try { ps?.close() } catch (_: Throwable) {}
+            try { cs?.close() } catch (_: Throwable) {}
         }
     }
 }

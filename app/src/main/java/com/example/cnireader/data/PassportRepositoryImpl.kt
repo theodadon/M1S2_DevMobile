@@ -29,7 +29,7 @@ class PassportRepositoryImpl @Inject constructor(
             val data: CniData = try {
                 PassportReader.read(tag, can, csca, logger)
             } catch (e: PassportReadException) {
-                logger.log("❌ Lecture CNI échouée : ${e.message}")
+                logger.log("Lecture CNI échouée : ${e.message}")
                 throw ScanException("Lecture CNI échouée : ${e.message}", e)
             }
 
@@ -37,13 +37,13 @@ class PassportRepositoryImpl @Inject constructor(
             val list = try {
                 emojiApi.getAllEmojis(accessKey)
             } catch (e: Exception) {
-                logger.log("❌ API Emoji KO : ${e.message}")
+                logger.log("API Emoji KO : ${e.message}")
                 throw ScanException("API Emoji KO : ${e.message}", e)
             }
             logger.log("✅ ${list.size} emojis reçus")
 
             val emoji = list[ThreadLocalRandom.current().nextInt(list.size)].character
-            logger.log("🎲 Emoji tiré : $emoji")
+            logger.log("Emoji tiré : $emoji")
 
             return ScanResult(
                 lastName = data.lastName,

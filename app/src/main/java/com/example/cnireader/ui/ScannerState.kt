@@ -9,8 +9,7 @@ sealed class ScannerState {
         val lastName: String,
         val firstNames: String,
         val birthDate: String,
-        val photo: Bitmap,
-        val emoji: String
+        val photo: Bitmap
     ) : ScannerState()
     data class Error(val message: String) : ScannerState()
 }

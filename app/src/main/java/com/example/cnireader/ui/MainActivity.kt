@@ -140,8 +140,10 @@ class MainActivity : AppCompatActivity() {
             if (intent.action != NfcAdapter.ACTION_TECH_DISCOVERED) return
             val tag: Tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
                 ?: throw IllegalStateException("Tag manquant")
+
+            // PAS de check sur la longueur du CAN !
             val can = binding.etCan.text.toString().trim()
-            require(can.length == 6) { "Le CAN doit contenir exactement 6 chiffres." }
+
             vm.scan(tag, can)
         } catch (e: Exception) {
             Log.e("MainActivity", "NFC error", e)

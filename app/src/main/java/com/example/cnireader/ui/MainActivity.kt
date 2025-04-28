@@ -31,50 +31,32 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Bouton manuel pour réinitialiser l'affichage
         binding.btnScan.setOnClickListener {
-            binding.tvLog.text     = "Approchez votre CNI..."
+            binding.tvLog.text = "Veuillez approcher la carte"
             binding.tvRawData.text = ""
-            binding.ivPhoto.setImageBitmap(null)
-            binding.ivPhoto.alpha = 0f
         }
 
-        // Observateur des états du ViewModel
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 vm.state.collectLatest { state ->
                     when (state) {
-                        ScannerState.Idle -> {
-                            binding.tvLog.text = "En attente..."
-                        }
+                        ScannerState.Idle -> {}
                         ScannerState.Scanning -> {
                             binding.tvLog.text = "Lecture en cours..."
-                            binding.tvRawData.text = ""
-                            binding.ivPhoto.setImageBitmap(null)
-                            binding.ivPhoto.alpha = 0f
-                        }
-                        is ScannerState.Success -> {
-                            binding.tvLog.text = "${state.lastName} ${state.firstNames}, né(e) ${state.birthDate}"
-                            binding.ivPhoto.setImageBitmap(state.photo)
-                            binding.ivPhoto.alpha = 1f
                             binding.tvRawData.text = ""
                         }
                         is ScannerState.Error -> {
                             binding.tvLog.text = "Erreur lors de la lecture"
                             binding.tvRawData.text = state.message
-                            binding.ivPhoto.setImageBitmap(null)
-                            binding.ivPhoto.alpha = 0f
                         }
                     }
                 }
             }
         }
 
-        // Initialisation NFC
         nfc = NfcAdapter.getDefaultAdapter(this)
         pi = PendingIntent.getActivity(
-            this,
-            0,
+            this, 0,
             Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_MUTABLE
         )
@@ -100,10 +82,10 @@ class MainActivity : AppCompatActivity() {
 
         val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
         if (tag == null) {
-            binding.tvLog.text = "Tag NFC non détecté"
+            binding.tvLog.text = "Erreur : Tag NFC manquant"
             return
         }
-
-        vm.scan(tag)
+        val can = binding.etCan.text.toString().trim()
+        vm.scan(tag, can)
     }
 }

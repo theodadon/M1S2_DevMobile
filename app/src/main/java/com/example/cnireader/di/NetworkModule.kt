@@ -32,7 +32,6 @@ object NetworkModule {
     @Provides @Singleton
     fun provideMoshi(): Moshi =
         Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-
     @Provides @Singleton
     fun provideRetrofit(client: OkHttpClient, moshi: Moshi): Retrofit =
         Retrofit.Builder()
